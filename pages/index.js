@@ -4,7 +4,6 @@ import Header from '../components/Header';
 import Gallery from '../components/Gallery';
 import ViewerModal from '../components/ViewerModal';
 import Footer from '../components/Footer';
-import UnlockButton from '../components/UnlockButton';
 
 export default function Home() {
 const [images, setImages] = useState([]);
@@ -13,16 +12,19 @@ const [openImage, setOpenImage] = useState(null);
 
 useEffect(() => {
 async function load() {
-setLoading(true);
-// Select id, title, url, description from images table
-const { data, error } = await supabase.from('images').select('id,title,url,description').order('id', { ascending: false }).limit(100);
+const { data, error } = await supabase
+.from('images')
+.select('id,title,url,description')
+.order('id', { ascending: false })
+.limit(100);
+
 if (error) {
-console.error('Error loading images', error);
+console.error(error);
 setImages([]);
 } else {
-// Supabase may return url as full public URL (if stored that way). If not, adjust accordingly.
 setImages(data || []);
 }
+
 setLoading(false);
 }
 load();
@@ -31,14 +33,16 @@ load();
 return (
 <div>
 <Header />
-<main style={{maxWidth:1100, margin:'24px auto', minHeight: '60vh'}}>
+<main style={{maxWidth:1100, margin:'24px auto', minHeight:'60vh'}}>
 <h2 style={{marginLeft:20}}>Latest Artwork</h2>
 {loading && <p style={{padding:20}}>Loading...</p>}
 {!loading && images.length === 0 && <p style={{padding:20}}>No images yet.</p>}
-{!loading && images.length > 0 && <Gallery images={images} onOpen={(img)=>setOpenImage(img)} />}
+{!loading && images.length > 0 && (
+<Gallery images={images} onOpen={img => setOpenImage(img)} />
+)}
 </main>
 
-{openImage && <ViewerModal image={openImage} onClose={()=>setOpenImage(null)} />}
+{openImage && <ViewerModal image={openImage} onClose={() => setOpenImage(null)} />}
 
 <Footer />
 </div>

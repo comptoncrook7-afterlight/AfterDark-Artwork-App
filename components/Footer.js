@@ -1,7 +1,7 @@
-export default function Footer(){
+export default function Footer() {
 return (
-<footer style={{padding:20, textAlign:'center', borderTop:'1px solid #eee', marginTop:40}}>
-<small>Â© {new Date().getFullYear()} AfterDark ArtWork</small>
+<footer style={{padding:20, textAlign:'center', marginTop:40, borderTop:'1px solid #333'}}>
+<small>©  AfterDark ArtWork</small>
 </footer>
 );
 }
