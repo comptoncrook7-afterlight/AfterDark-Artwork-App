@@ -1,0 +1,53 @@
+import { createClient } from '@supabase/supabase-js';
+import { useState } from 'react';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+export default function AdminComponent() {
+const [message, setMessage] = useState('');
+
+const handleUpload = async (event) => {
+const file = event.target.files[0];
+if (!file) return;
+
+const filePath = `${Date.now()}_${file.name}`;
+
+const { data, error } = await supabase.storage.from('images').upload(filePath, file);
+
+if (error) {
+console.error('Upload error:', error.message);
+setMessage('Upload failed: ' + error.message);
+return;
+}
+
+const { publicUrl, error: urlError } = supabase.storage.from('images').getPublicUrl(filePath);
+
+if (urlError) {
+console.error('URL error:', urlError.message);
+setMessage('Failed to get public URL: ' + urlError.message);
+return;
+}
+
+const { error: dbError } = await supabase
+.from('images')
+.insert([{ title: file.name, url: publicUrl, description: '' }]);
+
+if (dbError) {
+console.error('Database error:', dbError.message);
+setMessage('Failed to save to database: ' + dbError.message);
+return;
+}
+
+setMessage('Upload successful!');
+};
+
+return (
+<div>
+<h2>Upload Image</h2>
+<input type="file" onChange={handleUpload} />
+<p>{message}</p>
+</div>
+);
+}
